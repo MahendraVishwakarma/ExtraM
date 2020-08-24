@@ -9,16 +9,16 @@
 import Foundation
 import UIKit
 
-let imageCache = NSCache<NSString, NSData>()
+var imageCache = NSCache<NSString, UIImage>()
 
-class PendingOperations {
-  lazy var downloadsInProgress: [IndexPath: Operation] = [:]
-  lazy var downloadQueue: OperationQueue = {
-    var queue = OperationQueue()
-    queue.name = "Downloading_queue"
-    queue.maxConcurrentOperationCount = 1
-    return queue
-  }()
+class DownloadingOperations {
+    lazy var downloadsInProgress: [IndexPath: Operation] = [:]
+    lazy var downloadQueue: OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "Downloading_queue"
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
 }
 
 class ImageDownloadManager: Operation {
@@ -35,21 +35,32 @@ class ImageDownloadManager: Operation {
             return
         }
         let url = String(format: URLs.image, photoRecord.farm,photoRecord.server,photoRecord.id,photoRecord.secret)
+        
+        // check cached image
+        
         guard let imgURL = URL(string: url) else { return }
+        let key = imgURL.absoluteString as NSString
+        
+        if let cachedImage = imageCache.object(forKey: key)  {
+            photoRecord.imageData = cachedImage.pngData()
+            photoRecord.photoState = PhotoRecordState.downloaded
+            return
+        }
+        
+        
         guard let imageData = try? Data(contentsOf: imgURL) else { return }
         
         if isCancelled {
             return
         }
-        // check cached image
-        if let cachedImage = imageCache.object(forKey: url as NSString)  {
-            photoRecord.imageData = cachedImage as Data
-            photoRecord.photoState = PhotoRecordState.downloaded
-            return
-        }
+        
         
         if !imageData.isEmpty {
-            imageCache.setObject(imageData as NSData, forKey: url as NSString)
+            
+            DispatchQueue.main.async {
+                imageCache.setObject(UIImage(data: imageData)!, forKey: key )
+            }
+            
             photoRecord.imageData = imageData
             photoRecord.photoState = PhotoRecordState.downloaded
         } else {

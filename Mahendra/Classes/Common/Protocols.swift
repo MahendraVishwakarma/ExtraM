@@ -10,7 +10,5 @@ import Foundation
 
 //use for fetch data from server
 protocol FetchDataProtocols: AnyObject {
-    func fetchData()
-    func fetchData(with quesry: String)
     func updateView()
 }

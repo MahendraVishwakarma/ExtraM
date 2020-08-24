@@ -12,7 +12,7 @@ import Foundation
 final class HomeViewModel: NSObject {
     
     weak var delegate: FetchDataProtocols?
-    let pendingOperations = PendingOperations()
+    let pendingOperations = DownloadingOperations()
     var photos: PhotoModel?
     
     func fetchData(url: String) {
@@ -47,10 +47,7 @@ final class HomeViewModel: NSObject {
     func startOperations(photoRecord: Photo, indexPath: IndexPath) {
       
         if( photoRecord.photoState == PhotoRecordState.new) {
-            print("checking state:" + photoRecord.photoState!.rawValue)
             startDownload(photoRecord: photoRecord, at: indexPath)
-        } else {
-             print("checking other status:" + photoRecord.photoState!.rawValue)
         }
     }
     
