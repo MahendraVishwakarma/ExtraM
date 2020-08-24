@@ -25,10 +25,13 @@ class ImageViewer: UIView {
         
         initialization()
     }
+    func reloaData()  {
+        collectinview.reloadData()
+    }
     
     func setSelectedIndex() {
         DispatchQueue.main.asyncAfter(deadline: .now()) {
-            guard let index = self.photos.lastIndex(where: {$0.id == self.selectedID}) else{
+            guard let index = self.photos.firstIndex(where: {$0.id == self.selectedID}) else{
                 return
             }
             print(index)

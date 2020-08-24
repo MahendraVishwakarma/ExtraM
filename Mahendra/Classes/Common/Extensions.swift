@@ -80,17 +80,17 @@ extension HomeViewController: UIScrollViewDelegate {
 }
 extension HomeViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let imgViewer = ImageViewer(frame: self.view.bounds)
-        imgViewer.center = self.view.convert(self.view.center, from:self.view.superview)
-         self.view.window?.addSubview(imgViewer)
+        if(viewModel?.photos?.photos.photo[indexPath.row].photoState == .downloaded) {
+            let imgViewer = ImageViewer(frame: self.view.bounds)
+            //imgViewer.center = self.view.convert(self.view.center, from:self.view.superview)
+             self.view.window?.addSubview(imgViewer)
 
-        imgViewer.photos = viewModel?.photos?.photos.photo ?? []
-        imgViewer.selectedID = viewModel?.photos?.photos.photo[indexPath.row].id
-        imgViewer.setSelectedIndex()
-    
-        UIView.animate(withDuration: 0.4, animations: {
-            // imgViewer.frame = self.view.bounds
-        })
+            imgViewer.photos = viewModel?.photos?.photos.photo ?? []
+            imgViewer.reloaData()
+            imgViewer.selectedID = viewModel?.photos?.photos.photo[indexPath.row].id
+            imgViewer.setSelectedIndex()
+        }
+        
         
     }
 }
