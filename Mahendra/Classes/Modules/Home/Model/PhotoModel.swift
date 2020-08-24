@@ -22,9 +22,10 @@ class PhotoModel: Codable {
 
 // MARK: - Photos
 class Photos: Codable {
-    let page, pages, perpage: Int
+    var page:Int
+    let pages, perpage: Int
     let total: Total
-    let photo: [Photo]
+    var photo: [Photo]
 
     init(page: Int, pages: Int, perpage: Int, total: Total, photo: [Photo]) {
         self.page = page

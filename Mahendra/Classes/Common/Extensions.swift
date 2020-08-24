@@ -65,4 +65,38 @@ extension HomeViewController:UICollectionViewDelegateFlowLayout {
         
     }
 }
-
+//MARK:- searchBar  delegate
+extension HomeViewController: UISearchBarDelegate {
+   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    if searchText.count > 0 {
+        viewModel?.isNeedToAdd = false
+        viewModel?.fetchData(with: searchText)
+    }
+       
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+}
+extension HomeViewController: UIScrollViewDelegate {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+       
+        let  height = homeCollectionView.frame.size.height
+        let contentYoffset = homeCollectionView.contentOffset.y
+        let distanceFromBottom = homeCollectionView.contentSize.height - contentYoffset
+        if distanceFromBottom <= height && (viewModel?.photos?.photos.photo.count ?? 0) > 0 {
+            
+            print("you have reached at end poind")
+           
+            if((viewModel?.isFetched ?? false)) {
+                viewModel?.isFetched = false
+                let page_number = viewModel?.photos?.photos != nil ? (viewModel?.photos?.photos.page ?? 0) + 1 : 1
+                let url = String(format: URLs.photos, page_number)
+                viewModel?.isNeedToAdd = true
+                viewModel?.fetchData(url: url)
+                
+            }
+        }
+    }
+}

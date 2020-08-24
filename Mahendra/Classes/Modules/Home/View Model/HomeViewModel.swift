@@ -14,6 +14,8 @@ final class HomeViewModel: NSObject {
     weak var delegate: FetchDataProtocols?
     let pendingOperations = DownloadingOperations()
     var photos: PhotoModel?
+    var isFetched: Bool = true
+    var isNeedToAdd:Bool = false
     
     func fetchData(url: String) {
         
@@ -21,38 +23,44 @@ final class HomeViewModel: NSObject {
             guard let response = json as? PhotoModel else{
                 return nil
             }
-            
             return response
             
-        }) { (result) in
+        }) { [weak self] (result) in
+            self?.isFetched = true
             
             switch result {
             case .success(let list) :
-                
-                self.photos = list
-                self.delegate?.updateView()
+                if((self?.isNeedToAdd ?? false)) {
+                    self?.photos?.photos.photo.append(contentsOf: list?.photos.photo ?? [])
+                    self?.photos?.photos.page = list?.photos.page ?? 0
+                } else {
+                    self?.photos = list
+                }
+                self?.isNeedToAdd = false
+                self?.delegate?.updateView()
                 break
             case .failure(let error) :
                 print(error.localizedDescription)
-               // self.delegate?.generateError(error: error)
+                
                 break
             }
         }
     }
     
     func fetchData(with query: String) {
-        
+        let url = String(format: URLs.search, query)
+        fetchData(url: url)
     }
     
     func startOperations(photoRecord: Photo, indexPath: IndexPath) {
-      
+        
         if( photoRecord.photoState == PhotoRecordState.new) {
             startDownload(photoRecord: photoRecord, at: indexPath)
         }
     }
     
     func startDownload(photoRecord: Photo, at indexPath: IndexPath) {
-    
+        
         guard pendingOperations.downloadsInProgress[indexPath] == nil else {
             return
         }

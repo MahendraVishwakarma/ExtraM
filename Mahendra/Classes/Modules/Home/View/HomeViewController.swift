@@ -19,7 +19,6 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Do any additional setup after loading the view.
         setupUI()
     }
     
@@ -35,13 +34,13 @@ class HomeViewController: UIViewController {
         let url = String(format: URLs.photos, page_number)
         
         activityIndicator.startAnimating()
+        viewModel?.isNeedToAdd = false
         viewModel?.fetchData(url: url)
         
         // searchBar initialization
         searchController = UISearchController(searchResultsController: nil)
         searchController?.searchBar.placeholder = "search photo"
-        
-        //searchController?.searchBar.delegate = self
+        searchController?.searchBar.delegate = self
         self.definesPresentationContext = true
         searchController?.obscuresBackgroundDuringPresentation = false
         navigationItem.searchController = searchController
@@ -78,9 +77,8 @@ class HomeViewController: UIViewController {
         
         self.present(alert, animated: true, completion: nil)
     }
-    
+        
 }
-
 
 extension HomeViewController: FetchDataProtocols {
    
